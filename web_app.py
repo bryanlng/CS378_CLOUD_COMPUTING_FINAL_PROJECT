@@ -1,5 +1,9 @@
 import os
 import time
+from urllib.parse import urlparse
+
+import requests
+import json
 
 from flask import request
 from flask import Flask, render_template
@@ -7,6 +11,49 @@ from flask import Flask, render_template
 
 application = Flask(__name__)
 app = application
+
+#Creds
+YOUTUBE_DATA_API_V3 = os.environ.get("YOUTUBE_DATA_API_V3", None)
+
+"""
+Validates the youtube URL
+Takes in a url in the form of a string, then does the following:
+1. Check if hostname is youtube.com
+2. Check if video has been blocked
+
+"""
+def validate_youtube_url(url):
+    data = urlparse(url)
+    youtube_share_urls = ["youtu.be", "www.youtu.be"]
+    youtube_reg_urls = ["www.youtube.com", "youtube.com"]
+    acceptable_hostnames = youtube_share_urls + youtube_reg_urls
+
+    #Validate hostname. Check if it is a youtube url
+    hostname = str(data.hostname).lower()
+    if(hostname is None or hostname not in acceptable_hostnames):
+        print("bad")
+
+    #Extract out video id
+    video_id = ""
+    if hostname in youtube_share_urls:
+        video_id = str(data.path)[1:]       #ex: /URNN-_az-3g
+    else:
+        parts = str(data.query).split("&")  #ex: v=URNN-_az-3g&t=40
+        for part in parts:
+            if part[0:2] == "v=":
+                video_id = part[2:]
+
+    #Check if video has been blocked, by querying Youtube's Data API
+    print("video_id:{}".format(video_id))
+    youtube_query = "https://www.googleapis.com/youtube/v3/videos?part=id&id=" + video_id + "&key=" + YOUTUBE_DATA_API_V3
+    response = requests.get(youtube_query)
+    pretty_data = json.dumps(response.json(), indent=4)
+    print(pretty_data)
+
+
+
+
+
 
 
 @app.route("/")
@@ -16,5 +63,8 @@ def hello():
 
 if __name__ == "__main__":
     app.debug = True
-    initialize_table()
+    test_url = "https://www.youtube.com/watch?v=URNN-_az-3g"
+    test_url = "https://youtu.be/URNN-_az-3g?t=40"
+    test_url = "https://youtu.be/40BNY41SJCI"
+    validate_youtube_url(test_url)
     app.run(host='0.0.0.0')
