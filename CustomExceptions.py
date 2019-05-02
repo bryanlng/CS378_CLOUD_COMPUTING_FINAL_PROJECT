@@ -1,17 +1,11 @@
-class EmptyFieldException(Exception):
+class NotaYoutubeURLException(Exception):
    pass
 
-class BadNumberFormatException(Exception):
+class VideoChartNotFoundException(Exception):
    pass
 
-class NonPositiveNumberException(Exception):
+class ForbiddenVideoException(Exception):
    pass
 
-class CreditLimitPassedException(Exception):
+class VideoNotFoundException(Exception):
    pass
-
-class BeforeOpenDateException(Exception):
-   pass
-
-class AccountNotFoundException(Exception):
-    pass
