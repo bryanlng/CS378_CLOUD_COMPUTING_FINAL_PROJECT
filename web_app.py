@@ -21,7 +21,6 @@ YOUTUBE_DATA_API_V3 = os.environ.get("YOUTUBE_DATA_API_V3", None)
 
 
 
-
 @app.route("/")
 def hello():
     return render_template('index.html')

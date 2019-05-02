@@ -9,12 +9,18 @@ from CustomExceptions import NotaYoutubeURLException, VideoChartNotFoundExceptio
 #Creds
 YOUTUBE_DATA_API_V3 = os.environ.get("YOUTUBE_DATA_API_V3", None)
 
+
+youtube_share_urls = ["youtu.be", "www.youtu.be"]
+youtube_reg_urls = ["www.youtube.com", "youtube.com"]
+
+
 """
 Validates the hostname of the url
-Takes in the results of urlparse(url), of class urllib.parse.ParseResult
+Takes in a URL in the form of a string
 Also the lists that contain the youtube urls
 """
-def validate_hostname(data, youtube_share_urls, youtube_reg_urls):
+def validate_hostname(url):
+    data = urlparse(url)
     acceptable_hostnames = youtube_share_urls + youtube_reg_urls
     hostname = str(data.hostname).lower()
     if(hostname is None or hostname not in acceptable_hostnames):
@@ -22,9 +28,10 @@ def validate_hostname(data, youtube_share_urls, youtube_reg_urls):
 
 """
 Extracts the video id out of the url
-Takes in the results of urlparse(url), of class urllib.parse.ParseResult
+Takes in a URL in the form of a string
 """
-def extract_video_id(data, youtube_share_urls, youtube_reg_urls):
+def extract_video_id(url):
+    data = urlparse(url)
     hostname = str(data.hostname).lower()
     video_id = ""
     if hostname in youtube_share_urls:
@@ -78,8 +85,8 @@ def validate_youtube_url(url):
     youtube_reg_urls = ["www.youtube.com", "youtube.com"]
 
     try:
-        validate_hostname(data, youtube_share_urls, youtube_reg_urls)
-        video_id = extract_video_id(data, youtube_share_urls, youtube_reg_urls)
+        validate_hostname(data)
+        video_id = extract_video_id(data)
         check_video_accessible(video_id)
     except Exception as e:
         raise e
