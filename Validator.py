@@ -80,13 +80,9 @@ Takes in a url in the form of a string, then does the following:
 2. Check if video has been blocked
 """
 def validate_youtube_url(url):
-    data = urlparse(url)
-    youtube_share_urls = ["youtu.be", "www.youtu.be"]
-    youtube_reg_urls = ["www.youtube.com", "youtube.com"]
-
     try:
-        validate_hostname(data)
-        video_id = extract_video_id(data)
+        validate_hostname(url)
+        video_id = extract_video_id(url)
         check_video_accessible(video_id)
     except Exception as e:
         raise e
