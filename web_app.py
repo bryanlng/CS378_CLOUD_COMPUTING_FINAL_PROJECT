@@ -8,6 +8,8 @@ import json
 from flask import request
 from flask import Flask, render_template
 
+import CustomExceptions
+
 application = Flask(__name__)
 app = application
 
@@ -25,7 +27,7 @@ def validate_hostname(data, youtube_share_urls, youtube_reg_urls):
     acceptable_hostnames = youtube_share_urls + youtube_reg_urls
     hostname = str(data.hostname).lower()
     if(hostname is None or hostname not in acceptable_hostnames):
-        print("bad")
+        raise NotaYoutubeURLException("URL {} is not a proper Youtube URL".format(hostname))
 
 """
 Extracts the video id out of the url
@@ -56,20 +58,20 @@ def check_video_accessible(video_id):
     try:
         raw = requests.get(youtube_query)
         if raw.status_code == 400:
-            print("videoChart not found")
+            raise VideoChartNotFoundException("video chart not found, see https://developers.google.com/youtube/v3/docs/videos/list?authuser=0")
         elif raw.status_code == 403:
-            print("forbidden")
+            raise ForbiddenVideoException("video is forbidden, see https://developers.google.com/youtube/v3/docs/videos/list?authuser=0")
         elif raw.status_code == 404:
-            print("video not found")
+            raise VideoNotFound("video not found, see https://developers.google.com/youtube/v3/docs/videos/list?authuser=0")
         else:
             response = raw.json()
             pretty_data = json.dumps(raw.json(), indent=4)
             print(pretty_data)
 
             if len(response["items"]) == 0:
-                print("video deleted")
+                raise VideoNotFound("video not found, see https://developers.google.com/youtube/v3/docs/videos/list?authuser=0")
     except Exception as e:
-        print(e)
+        raise e
 
 
 """
