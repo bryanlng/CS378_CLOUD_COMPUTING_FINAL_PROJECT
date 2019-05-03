@@ -9,3 +9,12 @@ class ForbiddenVideoException(Exception):
 
 class VideoNotFoundException(Exception):
    pass
+
+class VideoSnippetUnavailableException(Exception):
+   pass
+
+class VideoTitleUnavailableException(Exception):
+   pass
+
+class VideoThumbnailUnavailableException(Exception):
+   pass
