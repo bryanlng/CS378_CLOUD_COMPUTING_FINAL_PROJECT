@@ -21,8 +21,8 @@ Also the lists that contain the youtube urls
 """
 def validate_hostname(url):
     data = urlparse(url)
-    acceptable_hostnames = youtube_share_urls + youtube_reg_urls
     hostname = str(data.hostname).lower()
+    acceptable_hostnames = youtube_share_urls + youtube_reg_urls
     if(hostname is None or hostname not in acceptable_hostnames):
         raise NotaYoutubeURLException("URL {} is not a proper Youtube URL".format(hostname))
 
@@ -33,6 +33,7 @@ Takes in a URL in the form of a string
 def extract_video_id(url):
     data = urlparse(url)
     hostname = str(data.hostname).lower()
+    
     video_id = ""
     if hostname in youtube_share_urls:
         video_id = str(data.path)[1:]       #ex: /URNN-_az-3g
