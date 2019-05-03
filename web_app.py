@@ -18,10 +18,10 @@ app = application
 
 
 #Creds
-db = os.environ.get("DB_NAME", None)
-username = os.environ.get("DB_USERNAME", None)
-password = os.environ.get("DB_PASSWORD", None)
-hostname = os.environ.get("DB_IP", None)
+db = os.environ.get("RDS_DB_NAME", None)
+username = os.environ.get("RDS_USERNAME", None)
+password = os.environ.get("RDS_PASSWORD", None)
+hostname = os.environ.get("RDS_HOSTNAME", None)
 
 def connect():
     connection = ''
@@ -53,7 +53,7 @@ def create_tables():
                             "MEDIA_FORMAT enum('MP3', 'AAC', 'FLAC', 'MP4', 'AVI', 'MOV', 'MKV') NOT NULL,"
                             "PRIMARY KEY (id),"
                             "CONSTRAINT FOREIGN KEY (YOUTUBE_VIDEO_ID)"
-                                "REFERENCES ACCOUNT (VIDEO_ID)"
+                                "REFERENCES VIDEOS (VIDEO_ID)"
                                 "ON UPDATE CASCADE ON DELETE CASCADE"
                             ")"
                         )
