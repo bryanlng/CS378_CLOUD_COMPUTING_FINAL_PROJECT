@@ -10,7 +10,7 @@ from flask import Flask, render_template
 import mysql.connector
 from mysql.connector import errorcode
 
-import Util
+import CloudSQLDB
 import Validator
 import YoutubeData
 import BucketFileStorage
@@ -21,6 +21,20 @@ application = Flask(__name__)
 app = application
 
 
+@app.route("/convert_video")
+def main_process():
+    #Grab parameters (url, format to convert to, time stamps)
+
+    #Check if (video id, media format) pair exists in the converted bucket
+    #If it does, find the video in the bucket
+
+
+
+
+def initialize():
+    # CloudSQLDB.create_tables()
+    BucketFileStorage.create_file_structure()
+
 @app.route("/")
 def hello():
     return render_template('index.html')
@@ -28,11 +42,12 @@ def hello():
 
 if __name__ == "__main__":
     app.debug = True
-    # Util.create_tables()
+    # CloudSQLDB.create_tables()
     # video_id = "7QBEIVuNrnQ"
     # t = YoutubeData.get_title(video_id)
     # th = YoutubeData.get_thumbnail(video_id)
     # print("Title: {}, Thumbnail url: {}".format(t,th))
     # create_file_structure()
     # BucketFileStorage.create_file_structure()
+    initialize()
     app.run(host='0.0.0.0')
