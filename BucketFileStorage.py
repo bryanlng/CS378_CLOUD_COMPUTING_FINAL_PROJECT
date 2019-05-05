@@ -1,12 +1,24 @@
 from google.cloud import storage
+import requests
+import json
+import os
 
+
+#Creds
+GCP_CS378_MASTER_ADMIN_API_KEY = os.environ.get("GCP_CS378_MASTER_ADMIN_API_KEY", None)
+
+"""
+Creates the file structure for the Buckets
+If we don't currently have the required bucket structure, it deletes all the current buckets,
+then adds all the buckets
+"""
 def create_file_structure():
     storage_client = storage.Client()
 
     # Check if the buckets have already been created
     b = storage_client.list_buckets()
-    required_number_buckets = 2
-    required_buckets = ["cs378_final_converted_videos", "cs378_final_raw_videos"]
+    required_buckets = ["cs378_final_converted_videos", "cs378_final_raw_videos", "trim_completed", "trim_staging"]
+    required_number_buckets = len(required_buckets)
     num_buckets = 0
     found_buckets = []
     for bucket in storage_client.list_buckets():
@@ -23,5 +35,30 @@ def create_file_structure():
             bucket.delete()
 
         # Create buckets with the appropriate file directory structure
-        converted = storage_client.create_bucket("cs378_final_converted_videos")
-        raw = storage_client.create_bucket("cs378_final_raw_videos")
+        for bucket_name in required_buckets:
+            storage_client.create_bucket(bucket_name)
+
+
+"""
+Attempst to get an object with name filename from bucket called bucket
+Return the object if successful, None if unsuccessful
+"""
+def get_object_from_bucket(filename, bucket_name):
+    storage_client = storage.Client()
+    bucket = storage_client.get_bucket(bucket_name)
+    blobs = bucket.list_blobs()
+    file = None
+    for blob in blobs:
+        print(blob.name)
+        if blob.name == filename:
+            file = blob
+    return file
+    # response = None
+    # try:
+    #     query = "https://www.googleapis.com/storage/v1/b/" + bucket + "/o/" + filename + "&key=" + GCP_CS378_MASTER_ADMIN_API_KEY
+    #     raw = requests.get(query)
+    #     response = raw
+    #     print(raw.json())
+    # except Exception as e:
+    #     print(e)
+    # return response

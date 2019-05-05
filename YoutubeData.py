@@ -1,9 +1,11 @@
 import os
+import requests
+import json
 import CustomExceptions
 from CustomExceptions import VideoSnippetUnavailableException, VideoTitleUnavailableException, VideoThumbnailUnavailableException
 
 #Creds
-YOUTUBE_DATA_API_V3 = os.environ.get("YOUTUBE_DATA_API_V3", None)
+GCP_CS378_MASTER_ADMIN_API_KEY = os.environ.get("GCP_CS378_MASTER_ADMIN_API_KEY", None)
 
 """
 Calls Youtube's Data API and returns a JSON containing data about the video,
@@ -16,7 +18,7 @@ def get_video_snippet_data(video_id):
     response = {}
     try:
         # print("video_id:{}".format(video_id))
-        youtube_query = "https://www.googleapis.com/youtube/v3/videos/?part=snippet&id=" + video_id + "&key=" + YOUTUBE_DATA_API_V3
+        youtube_query = "https://www.googleapis.com/youtube/v3/videos/?part=snippet&id=" + video_id + "&key=" + GCP_CS378_MASTER_ADMIN_API_KEY
         raw = requests.get(youtube_query)
         raw_json = raw.json()
 
@@ -27,7 +29,7 @@ def get_video_snippet_data(video_id):
         # pretty_data = json.dumps(raw.json(), indent=4)
         # print(pretty_data)
     except Exception as e:
-        raise VideoSnippetUnavailableException("Video snippet unavailable, see https://developers.google.com/youtube/v3/docs/videos/list")
+        raise VideoSnippetUnavailableException("Video snippet unavailable, see https://developers.google.com/youtube/v3/docs/videos/list. Actual Exception: {}".format(e))
     return response
 
 """
@@ -39,7 +41,7 @@ def get_title(video_id):
         snippet_data = get_video_snippet_data(video_id)
         title = snippet_data["title"]
         if title is None:
-            raise VideoTitleUnavailableException("Video title unavailable, see https://developers.google.com/youtube/v3/docs/videos/list")
+            raise VideoTitleUnavailableException("Video title unavailable, see https://developers.google.com/youtube/v3/docs/videos/list. Actual Exception: {}".format(e)")
     except Exception as e:
         print(e)
     return title
@@ -60,7 +62,7 @@ def get_thumbnail(video_id):
         snippet_data = get_video_snippet_data(video_id)
         thumbnails = snippet_data["thumbnails"]
         if thumbnails is None:
-            raise VideoThumbnailUnavailableException("Video thumbnail unavailable, see https://developers.google.com/youtube/v3/docs/videos/list")
+            raise VideoThumbnailUnavailableException("Video thumbnail unavailable, see https://developers.google.com/youtube/v3/docs/videos/list. Actual Exception: {}".format(e)")
 
         #Find the best thumbnail to use
         thumbnail_ordering = ["high", "maxres", "standard", "medium", "low"]
