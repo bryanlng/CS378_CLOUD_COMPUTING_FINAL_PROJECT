@@ -11,6 +11,7 @@ from flask import Flask, render_template
 import Validator
 import YoutubeData
 import BucketFileStorage
+import CloudFunctions
 import CustomExceptions
 from CustomExceptions import NotaYoutubeURLException, VideoChartNotFoundException, ForbiddenVideoException, VideoNotFoundException, VideoSnippetUnavailableException, VideoTitleUnavailableException, VideoThumbnailUnavailableException
 
@@ -21,9 +22,8 @@ app = application
 #####################
 ###Cloud Functions###
 #####################
-def download_video_cloud_function():
-    from flask import escape
-
+from flask import escape
+def download_video_cloud_function(request):
     """ Responds to an HTTP request using data from the request body parsed
     according to the "content-type" header.
     Args:
@@ -34,7 +34,8 @@ def download_video_cloud_function():
         Response object using `make_response`
         <http://flask.pocoo.org/docs/1.0/api/#flask.Flask.make_response>.
     """
-    return 'Hello World!'
+    return CloudFunctions.test(request)
+    # return 'Hello World!'
     # content_type = request.headers['content-type']
     # if content_type == 'application/json':
     #     request_json = request.get_json(silent=True)
