@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 
 import requests
 import json
-from CustomExceptions import NotaYoutubeURLException, VideoChartNotFoundException, ForbiddenVideoException, VideoNotFoundException
+from CustomExceptions import NotaYoutubeURLException, VideoChartNotFoundException, ForbiddenVideoException, VideoNotFoundException, VideoSnippetUnavailableException, VideoTitleUnavailableException, VideoThumbnailUnavailableException
 
 #Creds
 YOUTUBE_DATA_API_V3 = os.environ.get("YOUTUBE_DATA_API_V3", None)
@@ -33,7 +33,7 @@ Takes in a URL in the form of a string
 def extract_video_id(url):
     data = urlparse(url)
     hostname = str(data.hostname).lower()
-    
+
     video_id = ""
     if hostname in youtube_share_urls:
         video_id = str(data.path)[1:]       #ex: /URNN-_az-3g
