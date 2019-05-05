@@ -42,6 +42,8 @@ def create_file_structure():
 """
 Attempst to get an object with name filename from bucket called bucket
 Return the object if successful, None if unsuccessful
+
+Note that blob.name will give "filename.fileext"
 """
 def get_object_from_bucket(filename, bucket_name):
     storage_client = storage.Client()

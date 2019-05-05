@@ -19,8 +19,6 @@ app = application
 
 
 
-
-
 @app.route("/convert_video")
 def main_process():
     print("Main process")
@@ -78,11 +76,11 @@ def hello():
 
 if __name__ == "__main__":
     app.debug = True
-    video_id = "7QBEIVuNrnQ"
-    video_id = "Y-DvKfsG18w"
-    t = YoutubeData.get_title(video_id)
-    th = YoutubeData.get_thumbnail(video_id)
-    print("Title: {}, Thumbnail url: {}".format(t,th))
+    # video_id = "7QBEIVuNrnQ"
+    # video_id = "Y-DvKfsG18w"
+    # t = YoutubeData.get_title(video_id)
+    # th = YoutubeData.get_thumbnail(video_id)
+    # print("Title: {}, Thumbnail url: {}".format(t,th))
     # BucketFileStorage.create_file_structure()
     initialize()
     # BucketFileStorage.get_object_from_bucket("doesntexist.txt", "cs378_final_raw_videos")

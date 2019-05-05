@@ -1,3 +1,7 @@
-flask
-https://cdn.mysql.com/Downloads/Connector-Python/mysql-connector-python-1.0.12.tar.gz
+Flask==1.0.2
+ffmpeg-python==0.1.17
 google-cloud-storage==1.15.0
+gcloud==0.17.0
+google-api-core==1.10.0
+google-auth==1.6.3
+youtube-dl==2019.4.17
