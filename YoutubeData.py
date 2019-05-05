@@ -41,7 +41,7 @@ def get_title(video_id):
         snippet_data = get_video_snippet_data(video_id)
         title = snippet_data["title"]
         if title is None:
-            raise VideoTitleUnavailableException("Video title unavailable, see https://developers.google.com/youtube/v3/docs/videos/list. Actual Exception: {}".format(e)")
+            raise VideoTitleUnavailableException("Video title unavailable, see https://developers.google.com/youtube/v3/docs/videos/list. Actual Exception: {}".format(e))
     except Exception as e:
         print(e)
     return title
@@ -62,7 +62,7 @@ def get_thumbnail(video_id):
         snippet_data = get_video_snippet_data(video_id)
         thumbnails = snippet_data["thumbnails"]
         if thumbnails is None:
-            raise VideoThumbnailUnavailableException("Video thumbnail unavailable, see https://developers.google.com/youtube/v3/docs/videos/list. Actual Exception: {}".format(e)")
+            raise VideoThumbnailUnavailableException("Video thumbnail unavailable, see https://developers.google.com/youtube/v3/docs/videos/list. Actual Exception: {}".format(e))
 
         #Find the best thumbnail to use
         thumbnail_ordering = ["high", "maxres", "standard", "medium", "low"]
