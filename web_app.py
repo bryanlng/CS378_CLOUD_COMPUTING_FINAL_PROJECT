@@ -7,10 +7,7 @@ import json
 
 from flask import request
 from flask import Flask, render_template
-import mysql.connector
-from mysql.connector import errorcode
 
-import CloudSQLDB
 import Validator
 import YoutubeData
 import BucketFileStorage
@@ -32,7 +29,6 @@ def main_process():
 
 
 def initialize():
-    # CloudSQLDB.create_tables()
     BucketFileStorage.create_file_structure()
 
 @app.route("/")
@@ -42,7 +38,6 @@ def hello():
 
 if __name__ == "__main__":
     app.debug = True
-    # CloudSQLDB.create_tables()
     # video_id = "7QBEIVuNrnQ"
     # t = YoutubeData.get_title(video_id)
     # th = YoutubeData.get_thumbnail(video_id)
