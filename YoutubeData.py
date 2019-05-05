@@ -1,6 +1,7 @@
 import os
 import CustomExceptions
 from CustomExceptions import VideoSnippetUnavailableException, VideoTitleUnavailableException, VideoThumbnailUnavailableException
+
 #Creds
 YOUTUBE_DATA_API_V3 = os.environ.get("YOUTUBE_DATA_API_V3", None)
 
@@ -39,10 +40,8 @@ def get_title(video_id):
         title = snippet_data["title"]
         if title is None:
             raise VideoTitleUnavailableException("Video title unavailable, see https://developers.google.com/youtube/v3/docs/videos/list")
-
     except Exception as e:
         print(e)
-
     return title
 
 

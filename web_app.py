@@ -14,7 +14,8 @@ import Util
 import Validator
 import YoutubeData
 import BucketFileStorage
-
+import CustomExceptions
+from CustomExceptions import NotaYoutubeURLException, VideoChartNotFoundException, ForbiddenVideoException, VideoNotFoundException, VideoSnippetUnavailableException, VideoTitleUnavailableException, VideoThumbnailUnavailableException
 
 application = Flask(__name__)
 app = application
