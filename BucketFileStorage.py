@@ -80,3 +80,20 @@ def upload_object(bucket_name, source_file_name, destination_blob_name):
     print('File {} uploaded to bucket {} with dest filename{}.'.format(
         source_file_name, bucket_name,
         destination_blob_name))
+
+"""
+Copies an object, then puts it into the destination_bucket
+"""
+def copy_and_write_object(source_bucket_name, blob_name, dest_bucket_name):
+    """Copies a blob from one bucket to another with a new name."""
+    storage_client = storage.Client()
+    source_bucket = storage_client.get_bucket(source_bucket_name)
+    source_blob = source_bucket.blob(blob_name)
+    destination_bucket = storage_client.get_bucket(dest_bucket_name)
+
+    new_blob = source_bucket.copy_blob(
+        source_blob, destination_bucket, blob_name)
+
+    print('Blob {} in source bucket {} copied to blob {} in dest bucket {}.'.format(
+        source_blob.name, source_bucket.name, new_blob.name,
+        destination_bucket.name))

@@ -20,17 +20,14 @@ def download_video(request):
     return jsonify(request.args)
     request object, which is a Flask Request object
     Extract the following parameters out from request.args:
-    1. URL:
+    1. url:
         -the full url, not just the video id
+
+    Ex:
+    https://us-central1-cs378-final-project-media.cloudfunctions.net/download_video_cloud_function?url=https://www.youtube.com/watch?v=BotpJkJ0BKE
     """
     url = str(request.args.get("url"))
     info = {}
-    s = "dummy"
-    info["dummy"] = s
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    cwd = os.getcwd()
-    info["dir_path"] = dir_path
-    info["cwd"] = cwd
     try:
         yt = YouTube(url)
         result = yt.streams.filter(file_extension='mp4').first().download("/tmp")
@@ -58,6 +55,59 @@ def download_video(request):
         BucketFileStorage.upload_object(bucket_name, source_file_name, destination_blob_name)
 
 
+    except Exception as e:
+        error = traceback.print_exc()
+        info["problems_traceback"] = str(error)
+        info["problems_just_e"] = str(e)
+
+    return jsonify(info)
+
+
+
+def convert_video(request):
+    """
+    Calls FFMPEG
+
+    Requires the following params:
+    1. url
+    2. desired_format
+
+    Input:
+    request object, which is a Flask Request object
+    Extract the following parameters out from request.args:
+    1. url:
+        -the full url, not just the video id
+        -we'll use this to create the bucket filename
+        -format: <video_id>::<title>.mp4
+
+    2. desired_format:
+        -choices:
+            -mp3, aac, flac, avi, mov, mkv
+
+    Ex:
+    https://us-central1-cs378-final-project-media.cloudfunctions.net/convert_video_cloud_function?url=https://www.youtube.com/watch?v=BotpJkJ0BKE&desired_format=mkv
+    """
+    url = str(request.args.get("url"))
+    desired_format = str(request.args.get("desired_format"))
+
+    info = {}
+    try:
+        #Create filename
+        video_id = Validator.extract_video_id(url)
+        yt = YouTube(url)
+        filename = video_id + "::" + yt.title + ".mp4"
+        info[filename] = filename
+        if desired_format != "mp4":
+            #It's already in mp4, so we don't have to convert it. Make a copy of it and move it to the converted bucket
+            source_bucket_name = "cs378_final_raw_videos"
+            dest_bucket_name = "cs378_final_converted_videos"
+            info["source_bucket_name"] = "cs378_final_raw_videos"
+            info["dest_bucket_name"] = "cs378_final_converted_videos"
+            BucketFileStorage.copy_and_write_object(source_bucket_name, filename, dest_bucket_name)
+        else:
+            
+
+        #Regardless,
     except Exception as e:
         error = traceback.print_exc()
         info["problems_traceback"] = str(error)
