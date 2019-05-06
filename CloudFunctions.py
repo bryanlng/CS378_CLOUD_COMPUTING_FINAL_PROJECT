@@ -2,15 +2,45 @@ from __future__ import unicode_literals
 from flask import escape
 from flask import jsonify
 
+from pytube import YouTube
 import youtube_dl
 import traceback
 
 import sys
 
 
-
-
 def download_video(request):
+    """
+    Calls pytube
+
+    Input:
+    return jsonify(request.args)
+    request object, which is a Flask Request object
+    Extract the following parameters out from request.args:
+    1. URL:
+        -the full url, not just the video id
+    """
+    url = str(request.args.get("url"))
+    info = {}
+    s = "dummy"
+    info["dummy"] = s
+    try:
+        yt = YouTube(url)
+        streams = yt.streams
+        info["streams"] = str(streams)
+        result = yt.streams.first().download()
+
+    except Exception as e:
+        error = traceback.print_exc()
+        info["problems_traceback"] = str(error)
+        info["problems_just_e"] = str(e)
+
+    return jsonify(info)
+
+
+
+
+def download_video_youtube_dl(request):
     """
     Calls youtube-dl
 
