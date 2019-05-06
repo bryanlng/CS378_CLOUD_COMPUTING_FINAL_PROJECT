@@ -22,19 +22,18 @@ app = application
 #####################
 ###Cloud Functions###
 #####################
-from flask import escape
 def download_video_cloud_function(request):
     """ Responds to an HTTP request using data from the request body parsed
     according to the "content-type" header.
     Args:
         request (flask.Request): The request object.
         <http://flask.pocoo.org/docs/1.0/api/#flask.Request>
-    Returns:
-        The response text, or any set of values that can be turned into a
-        Response object using `make_response`
-        <http://flask.pocoo.org/docs/1.0/api/#flask.Flask.make_response>.
+
+    Ex:
+        https://us-central1-cs378-final-project-media.cloudfunctions.net/download_video_cloud_function?url=no
+
     """
-    return CloudFunctions.test(request)
+    return CloudFunctions.download_video(request, app)
     # return 'Hello World!'
     # content_type = request.headers['content-type']
     # if content_type == 'application/json':
