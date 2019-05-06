@@ -6,8 +6,9 @@ from pytube import YouTube
 # import youtube_dl
 import traceback
 import os
-
 import sys
+import BucketFileStorage
+import Validator
 
 
 def download_video(request):
@@ -31,12 +32,19 @@ def download_video(request):
     info["cwd"] = cwd
     try:
         yt = YouTube(url)
-        streams = yt.streams
-        # streams_list = []
-        # for stream in streams:
-        #     streams_list.append(stream)
-        # info["streams"] = str(streams_list)
-        result = yt.streams.first().download("/tmp")
+        result = yt.streams.filter(file_extension='mp4').first().download("/tmp")
+        files_in_tmp = ""
+        for root, dirs, files in os.walk("/tmp"):
+            for filename in files:
+                files_in_tmp += str(filename)
+        info["files_in_tmp"] = files_in_tmp
+
+        #Upload to Google Cloud Bucket
+        video_id = Validator.extract_video_id(url)
+        bucket_name = "cs378_final_converted_videos"
+        source_file_name = yt.title + ".mp4"
+        destination_blob_name = video_id + "::" + yt.title + ".mp4"
+        BucketFileStorage.upload_object(bucket_name, source_file_name, destination_blob_name)
 
     except Exception as e:
         error = traceback.print_exc()

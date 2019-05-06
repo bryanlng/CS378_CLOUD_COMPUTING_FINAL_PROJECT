@@ -40,7 +40,7 @@ def create_file_structure():
 
 
 """
-Attempst to get an object with name filename from bucket called bucket
+Attempts to get an object with name filename from bucket called bucket
 Return the object if successful, None if unsuccessful
 
 Note that blob.name will give "filename.fileext"
@@ -64,3 +64,19 @@ def get_object_from_bucket(filename, bucket_name):
     # except Exception as e:
     #     print(e)
     # return response
+
+
+"""
+Uploads an object to the bucket
+"""
+def upload_object(bucket_name, source_file_name, destination_blob_name):
+    """Uploads a file to the bucket."""
+    storage_client = storage.Client()
+    bucket = storage_client.get_bucket(bucket_name)
+    blob = bucket.blob(destination_blob_name)
+
+    blob.upload_from_filename(source_file_name)
+
+    print('File {} uploaded to bucket {} with dest filename{}.'.format(
+        source_file_name, bucket_name,
+        destination_blob_name))
