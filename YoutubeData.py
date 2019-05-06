@@ -81,8 +81,3 @@ def get_thumbnail(video_id):
         print(e)
 
     return thumbnail_image_url
-
-
-
-
-def get

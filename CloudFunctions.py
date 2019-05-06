@@ -9,6 +9,7 @@ import os
 import sys
 import BucketFileStorage
 import Validator
+from google.cloud import storage
 
 
 def download_video(request):
@@ -33,18 +34,29 @@ def download_video(request):
     try:
         yt = YouTube(url)
         result = yt.streams.filter(file_extension='mp4').first().download("/tmp")
-        files_in_tmp = ""
+        main_file = ""
+        files_in_tmp = "Files: "
+        dirs_in_tmp = " Dirs: "
         for root, dirs, files in os.walk("/tmp"):
             for filename in files:
-                files_in_tmp += str(filename)
-        info["files_in_tmp"] = files_in_tmp
+                main_file += str(os.path.join(root, filename))
+                files_in_tmp += str(os.path.join(root, filename))
+            for dirname in dirs:
+                dirs_in_tmp += str(os.path.join(root, dirname))
+        info["files_and_dirs_in_tmp"] = files_in_tmp + dirs_in_tmp
+        info["abs_path_to_file"] = os.path.abspath(yt.title + ".mp4")
 
         #Upload to Google Cloud Bucket
         video_id = Validator.extract_video_id(url)
-        bucket_name = "cs378_final_converted_videos"
-        source_file_name = yt.title + ".mp4"
+        bucket_name = "cs378_final_raw_videos"
+        source_file_name = main_file
         destination_blob_name = video_id + "::" + yt.title + ".mp4"
+        info["video_id"] = video_id
+        info["bucket_name"] = bucket_name
+        info["source_file_name"] = source_file_name
+        info["destination_blob_name"] = destination_blob_name
         BucketFileStorage.upload_object(bucket_name, source_file_name, destination_blob_name)
+
 
     except Exception as e:
         error = traceback.print_exc()
