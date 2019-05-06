@@ -6,9 +6,16 @@ from io import BytesIO
 import youtube_dl
 import traceback
 
+application = Flask(__name__)
+app = application
 
 
 
+def test():
+    request = {
+        "url": "https://us-central1-cs378-final-project-media.cloudfunctions.net/download_video_cloud_function?url=https://www.youtube.com/watch?v=jnQ4V-wajLY"
+    }
+    download_video(request)
 
 def download_video(request):
     """
@@ -43,3 +50,10 @@ def download_video(request):
         info["problems_just_e"] = str(e)
 
     return jsonify(info)
+
+
+
+if __name__ == "__main__":
+    app.debug = True
+    test()
+    app.run(host='0.0.0.0')

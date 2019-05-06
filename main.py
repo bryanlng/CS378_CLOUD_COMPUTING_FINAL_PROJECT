@@ -33,7 +33,7 @@ def download_video_cloud_function(request):
         https://us-central1-cs378-final-project-media.cloudfunctions.net/download_video_cloud_function?url=no
 
     """
-    return CloudFunctions.download_video(request, app)
+    return CloudFunctions.download_video(request)
     # return 'Hello World!'
     # content_type = request.headers['content-type']
     # if content_type == 'application/json':
