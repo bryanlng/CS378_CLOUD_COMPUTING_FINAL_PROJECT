@@ -9,8 +9,8 @@ import os
 import sys
 import BucketFileStorage
 import Validator
-from google.cloud import storage
-
+import ffmpy
+import subprocess
 
 def download_video(request):
     """
@@ -96,18 +96,68 @@ def convert_video(request):
         video_id = Validator.extract_video_id(url)
         yt = YouTube(url)
         filename = video_id + "::" + yt.title + ".mp4"
-        info[filename] = filename
-        if desired_format != "mp4":
+
+        source_bucket_name = "cs378_final_raw_videos"
+        dest_bucket_name = "cs378_final_converted_videos"
+        info["source_bucket_name"] = source_bucket_name
+        info["dest_bucket_name"] = dest_bucket_name
+        info["filename"] = filename
+        info["desired_format"] = desired_format
+
+
+        if desired_format == "mp4":
             #It's already in mp4, so we don't have to convert it. Make a copy of it and move it to the converted bucket
-            source_bucket_name = "cs378_final_raw_videos"
-            dest_bucket_name = "cs378_final_converted_videos"
-            info["source_bucket_name"] = "cs378_final_raw_videos"
-            info["dest_bucket_name"] = "cs378_final_converted_videos"
             BucketFileStorage.copy_and_write_object(source_bucket_name, filename, dest_bucket_name)
         else:
-            
+            #Get file from raw bucket
+            BucketFileStorage.download_object(filename, source_bucket_name, "/tmp/" + filename)
 
-        #Regardless,
+            filename_in_tmp = ""
+            files_in_tmp = "Files: "
+            dirs_in_tmp = " Dirs: "
+            for root, dirs, files in os.walk("/tmp"):
+                for filename in files:
+                    filename_in_tmp += str(os.path.join(root, filename))
+                    files_in_tmp += str(os.path.join(root, filename)) + ", "
+                for dirname in dirs:
+                    dirs_in_tmp += str(os.path.join(root, dirname))
+            info["before_files_and_dirs_in_tmp"] = files_in_tmp + dirs_in_tmp
+            info["filename_in_tmp"] = filename_in_tmp
+            output_filename = filename[:len(filename)-len(desired_format)] + desired_format
+            info["output_filename"] = output_filename
+
+            #Run the ffmpeg command using the os.popen command
+            # os.popen("ffmpeg -i '{input}' '{output}'.'{format}'".format(input = filename, output = output_filename, format = desired_format))
+            cmds = ['ffmpeg', '-i', filename, output_filename]
+            subprocess.Popen(cmds)
+
+            files_in_tmp = "Files: "
+            dirs_in_tmp = " Dirs: "
+            for root, dirs, files in os.walk("/tmp"):
+                for filename in files:
+                    files_in_tmp += str(os.path.join(root, filename)) + ", "
+                for dirname in dirs:
+                    dirs_in_tmp += str(os.path.join(root, dirname)) + ", "
+            info["after_files_and_dirs_in_tmp"] = files_in_tmp + dirs_in_tmp
+
+            output_filename_new_format_in_tmp = filename_in_tmp[:len(filename_in_tmp)-len(desired_format)] + desired_format
+            info["output_filename_new_format_in_tmp"] = output_filename_new_format_in_tmp
+            # ff = ffmpy.FFmpeg(
+            #     inputs={filename: None},
+            #     outputs={output_filename: None}
+            # )
+            # ff.run()
+
+            #Upload to Google Cloud Bucket
+            BucketFileStorage.upload_object(source_bucket_name, output_filename_new_format_in_tmp, output_filename)
+
+            #Make a copy of it and move it to the converted bucket
+            BucketFileStorage.copy_and_write_object(source_bucket_name, output_filename, dest_bucket_name)
+
+            #Delete the copy of it inside cs378_final_raw_videos bucket
+            BucketFileStorage.delete_object(source_bucket_name, output_filename)
+
+
     except Exception as e:
         error = traceback.print_exc()
         info["problems_traceback"] = str(error)

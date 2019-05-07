@@ -42,8 +42,9 @@ def create_file_structure():
 """
 Attempts to get an object with name filename from bucket called bucket
 Return the object if successful, None if unsuccessful
-
 Note that blob.name will give "filename.fileext"
+
+Returns it in a variable
 """
 def get_object_from_bucket(filename, bucket_name):
     storage_client = storage.Client()
@@ -64,6 +65,22 @@ def get_object_from_bucket(filename, bucket_name):
     # except Exception as e:
     #     print(e)
     # return response
+
+
+"""
+Downloads it, in FILE form
+"""
+def download_object(source_blob_name, bucket_name, destination_file_name):
+    """Downloads a blob from the bucket."""
+    storage_client = storage.Client()
+    bucket = storage_client.get_bucket(bucket_name)
+    blob = bucket.blob(source_blob_name)
+
+    blob.download_to_filename(destination_file_name)
+
+    print('Blob {} downloaded to {}.'.format(
+        source_blob_name,
+        destination_file_name))
 
 
 """
@@ -97,3 +114,16 @@ def copy_and_write_object(source_bucket_name, blob_name, dest_bucket_name):
     print('Blob {} in source bucket {} copied to blob {} in dest bucket {}.'.format(
         source_blob.name, source_bucket.name, new_blob.name,
         destination_bucket.name))
+
+"""
+Delete object from bucket
+"""
+def delete_object(bucket_name, blob_name):
+    """Deletes a blob from the bucket."""
+    storage_client = storage.Client()
+    bucket = storage_client.get_bucket(bucket_name)
+    blob = bucket.blob(blob_name)
+
+    blob.delete()
+
+    print('Blob {} deleted.'.format(blob_name))
