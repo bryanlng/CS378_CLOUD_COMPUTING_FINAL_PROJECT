@@ -50,6 +50,8 @@ def download_video(request):
     return info
 
 def subcalls():
+    filename = "mac_mac_test.mp4"
+    output_filename = "mac_mac_test.mkv"
     p = subprocess.Popen(['sudo', 'add-apt-repository', 'ppa:mc3man/trusty-media'], stdin=PIPE, shell=True)
     p.communicate(input='\n')
     p = subprocess.Popen(['sudo', 'apt-get', 'update'], stdin=PIPE, shell=True)
@@ -59,7 +61,7 @@ def subcalls():
     p = subprocess.call(['sudo', 'apt-get', 'install', 'frei0r-plugins'], stdin=PIPE, shell=True)
     p.communicate(input='\n')
     p = subprocess.call(['ffmpeg', '-i', filename, output_filename], stdin=PIPE, shell=True)
-    p = subprocess.call('ffmpeg -i ' + str(filename) + ' ' + str(output_filename), shell=True)
+    # p = subprocess.call('ffmpeg -i ' + str(filename) + ' ' + str(output_filename), shell=True)
 
 # test()
 subcalls()
