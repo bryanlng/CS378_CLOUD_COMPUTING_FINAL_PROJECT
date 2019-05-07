@@ -5,6 +5,8 @@ from flask import jsonify
 from io import BytesIO
 import youtube_dl
 import traceback
+import subprocess
+
 
 def test():
     request = {
@@ -46,4 +48,13 @@ def download_video(request):
 
     return info
 
-test()
+def subcalls():
+    subprocess.call(['sudo', 'add-apt-repository', 'ppa:mc3man/trusty-media'])
+    subprocess.call(['sudo', 'apt-get', 'update'])
+    subprocess.call(['sudo', 'apt-get', 'install', 'ffmpeg'])
+    subprocess.call(['sudo', 'apt-get', 'install', 'frei0r-plugins'])
+    subprocess.call(['ffmpeg', '-i', filename, output_filename])
+    subprocess.call('ffmpeg -i ' + str(filename) + ' ' + str(output_filename), shell=True)
+
+# test()
+subcalls()

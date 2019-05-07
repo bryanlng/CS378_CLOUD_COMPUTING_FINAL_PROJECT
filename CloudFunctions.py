@@ -129,7 +129,13 @@ def convert_video(request):
             #Run the ffmpeg command using the os.popen command
             # os.popen("ffmpeg -i '{input}' '{output}'.'{format}'".format(input = filename, output = output_filename, format = desired_format))
             cmds = ['ffmpeg', '-i', filename, output_filename]
-            subprocess.Popen(cmds)
+            # subprocess.Popen(cmds)
+            subprocess.call(['sudo', 'add-apt-repository', 'ppa:mc3man/trusty-media'])
+            subprocess.call(['sudo', 'apt-get', 'update'])
+            subprocess.call(['sudo', 'apt-get', 'install', 'ffmpeg'])
+            subprocess.call(['sudo', 'apt-get', 'install', 'frei0r-plugins'])
+            subprocess.call(['ffmpeg', '-i', filename, output_filename])
+            subprocess.call('ffmpeg -i ' + str(filename) + ' ' + str(output_filename), shell=True)
 
             files_in_tmp = "Files: "
             dirs_in_tmp = " Dirs: "
@@ -149,13 +155,13 @@ def convert_video(request):
             # ff.run()
 
             #Upload to Google Cloud Bucket
-            BucketFileStorage.upload_object(source_bucket_name, output_filename_new_format_in_tmp, output_filename)
+            # BucketFileStorage.upload_object(source_bucket_name, output_filename_new_format_in_tmp, output_filename)
 
             #Make a copy of it and move it to the converted bucket
-            BucketFileStorage.copy_and_write_object(source_bucket_name, output_filename, dest_bucket_name)
+            # BucketFileStorage.copy_and_write_object(source_bucket_name, output_filename, dest_bucket_name)
 
             #Delete the copy of it inside cs378_final_raw_videos bucket
-            BucketFileStorage.delete_object(source_bucket_name, output_filename)
+            # BucketFileStorage.delete_object(source_bucket_name, output_filename)
 
 
     except Exception as e:
