@@ -17,7 +17,7 @@ def create_file_structure():
 
     # Check if the buckets have already been created
     b = storage_client.list_buckets()
-    required_buckets = ["cs378_final_converted_videos", "cs378_final_raw_videos", "trim_completed", "trim_staging"]
+    required_buckets = ["cs378_final_converted_videos", "cs378_final_raw_videos"]
     required_number_buckets = len(required_buckets)
     num_buckets = 0
     found_buckets = []

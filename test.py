@@ -7,6 +7,7 @@ import youtube_dl
 import traceback
 import subprocess
 from subprocess import Popen, PIPE
+import ffmpy
 
 
 def test():
@@ -65,7 +66,16 @@ def subcalls():
     p.communicate(input='\n')
     print("Pass 4\n\n\n")
     p = subprocess.Popen('ffmpeg -i ' + str(filename) + ' ' + str(output_filename), shell=True)
-    p.communicate(input='\n') 
+    p.communicate(input='\n')
     print("Pass 5\n\n\n")
+
+def ffmpymine(filename, output_filename):
+    ff = ffmpy.FFmpeg(
+        inputs={filename: None},
+        outputs={output_filename: None}
+    )
+    ff.run()
+
 # test()
-subcalls()
+# subcalls()
+ffmpymine()

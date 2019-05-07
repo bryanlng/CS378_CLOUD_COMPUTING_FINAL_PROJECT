@@ -11,7 +11,7 @@ import BucketFileStorage
 import Validator
 import ffmpy
 import subprocess
-from subprocess import Popen, run, PIPE
+from subprocess import Popen, run, PIPE, check_call, CalledProcessError
 
 def download_video(request):
     """
@@ -144,9 +144,8 @@ def convert_video(request):
             p = subprocess.run('sudo apt-get install frei0r-plugins', stdout=PIPE, input='\n', shell=True, encoding='ascii')
             # p.communicate(input='\n')
             info["Pass 3: sudo apt-get install frei0r-plugins"] = "yes"
-            # p = subprocess.Popen('ffmpeg -i ' + str(filename) + ' ' + str(output_filename), shell=True, encoding='utf8')
-            p = subprocess.run('ffmpeg -i ' + str(filename) + ' ' + str(output_filename), stdout=PIPE, input='\n', shell=True, encoding='ascii')
-            p.communicate(input=None, timeout=None)
+            p = subprocess.run('ffmpeg -i ' + str(filename) + ' ' + str(output_filename),  shell=True, encoding='ascii', capture_output=True, check=True)
+            # p = subprocess.check_call('ffmpeg -i ' + str(filename) + ' ' + str(output_filename), stdout=PIPE, input='\n', shell=True, encoding='ascii', capture_output=True, check=True)
             info["Pass 4: ffmpeg -i filename output_filename"] = "yes"
 
             files_in_tmp = "Files: "
@@ -175,7 +174,11 @@ def convert_video(request):
             #Delete the copy of it inside cs378_final_raw_videos bucket
             BucketFileStorage.delete_object(source_bucket_name, output_filename)
 
-
+    except CalledProcessError as cpe:
+        info["CalledProcessError main output"] = str(cpe)
+        info["CalledProcessError returncode"] = str(cpe.returncode)
+        info["CalledProcessError cmd"] = str(cpe.cmd)
+        info["CalledProcessError output"] = str(cpe.output)
     except Exception as e:
         error = traceback.print_exc()
         info["problems_traceback"] = str(error)
