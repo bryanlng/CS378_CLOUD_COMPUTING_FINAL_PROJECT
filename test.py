@@ -6,6 +6,7 @@ from io import BytesIO
 import youtube_dl
 import traceback
 import subprocess
+from subprocess import Popen, PIPE
 
 
 def test():
@@ -49,12 +50,14 @@ def download_video(request):
     return info
 
 def subcalls():
-    subprocess.call(['sudo', 'add-apt-repository', 'ppa:mc3man/trusty-media'])
-    subprocess.call(['sudo', 'apt-get', 'update'])
-    subprocess.call(['sudo', 'apt-get', 'install', 'ffmpeg'])
-    subprocess.call(['sudo', 'apt-get', 'install', 'frei0r-plugins'])
-    subprocess.call(['ffmpeg', '-i', filename, output_filename])
-    subprocess.call('ffmpeg -i ' + str(filename) + ' ' + str(output_filename), shell=True)
+    p = subprocess.Popen(['sudo', 'add-apt-repository', 'ppa:mc3man/trusty-media'], stdin=PIPE, shell=True)
+    p.communicate(input='\n')
+    p = subprocess.Popen(['sudo', 'apt-get', 'update'])
+    p.communicate(input='\n')
+    #p = subprocess.call(['sudo', 'apt-get', 'install', 'ffmpeg'])
+    #subprocess.call(['sudo', 'apt-get', 'install', 'frei0r-plugins'])
+    #subprocess.call(['ffmpeg', '-i', filename, output_filename])
+    #subprocess.call('ffmpeg -i ' + str(filename) + ' ' + str(output_filename), shell=True)
 
 # test()
 subcalls()
