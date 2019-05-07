@@ -78,4 +78,4 @@ def ffmpymine(filename, output_filename):
 
 # test()
 # subcalls()
-ffmpymine()
+ffmpymine("spoderman.mp4", "spoderman.mp3")
