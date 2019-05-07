@@ -8,6 +8,8 @@ import traceback
 import subprocess
 from subprocess import Popen, PIPE
 import ffmpy
+import ffmpeg
+
 
 
 def test():
@@ -76,6 +78,12 @@ def ffmpymine(filename, output_filename):
     )
     ff.run()
 
+def ffmpegkorenig(filename,output_filename):
+    stream = ffmpeg.input(filename)
+    stream = ffmpeg.output(stream, output_filename)
+    ffmpeg.run(stream)
+
 # test()
 # subcalls()
-ffmpymine("spoderman.mp4", "spoderman.mp3")
+# ffmpymine("spoderman.mp4", "spoderman.mp3")
+ffmpegkorenig("spoderman.mp4", "spoderman.mp3")

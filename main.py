@@ -61,6 +61,9 @@ def main_process():
     print("Main process")
     #Grab parameters (url, format to convert to, time stamps)
 
+
+    #Validate URL
+
     #Check if (video id, media format) pair exists in the converted bucket
     #If it does, find the video in the bucket
 

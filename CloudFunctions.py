@@ -10,8 +10,9 @@ import sys
 import BucketFileStorage
 import Validator
 import ffmpy
+import ffmpeg
 import subprocess
-from subprocess import Popen, run, PIPE, check_call, CalledProcessError
+from subprocess import Popen, run, PIPE, check_call, CalledProcessError, check_output
 
 def download_video(request):
     """
@@ -48,7 +49,7 @@ def download_video(request):
         video_id = Validator.extract_video_id(url)
         bucket_name = "cs378_final_raw_videos"
         source_file_name = main_file
-        destination_blob_name = video_id + "::" + yt.title + ".mp4"
+        destination_blob_name = video_id + ".mp4"
         info["video_id"] = video_id
         info["bucket_name"] = bucket_name
         info["source_file_name"] = source_file_name
@@ -96,7 +97,7 @@ def convert_video(request):
         #Create filename
         video_id = Validator.extract_video_id(url)
         yt = YouTube(url)
-        filename = video_id + "::" + yt.title + ".mp4"
+        filename = video_id + ".mp4"
 
         source_bucket_name = "cs378_final_raw_videos"
         dest_bucket_name = "cs378_final_converted_videos"
@@ -128,25 +129,38 @@ def convert_video(request):
             info["output_filename"] = output_filename
 
             #Run the ffmpeg command using the os.popen command
-            # os.popen("ffmpeg -i '{input}' '{output}'.'{format}'".format(input = filename, output = output_filename, format = desired_format))
-            # cmds = ['ffmpeg', '-i', filename, output_filename]
-            # subprocess.Popen(cmds)
-            # p = subprocess.Popen('sudo apt-get update', stdin=PIPE, shell=True, encoding='utf8')
+            p = subprocess.run('sudo apt-get install ppa-purge && sudo ppa-purge ppa:jonathonf/ffmpeg-4', stdout=PIPE, input='\n', shell=True, encoding='ascii')
+            info["Pass -1: idempotent sudo apt-get install ppa-purge && sudo ppa-purge ppa:jonathonf/ffmpeg-4"] = "yes"
+
+            p = subprocess.run('sudo add-apt-repository ppa:jonathonf/ffmpeg-4', stdout=PIPE, input='\n', shell=True, encoding='ascii')
+            info["Pass 0: sudo add-apt-repository ppa:jonathonf/ffmpeg-4"] = "yes"
+
             p = subprocess.run('sudo apt-get update', stdout=PIPE, input='\n', shell=True, encoding='ascii')
-            # info["Pass .5"] = "yes"
-            # p.communicate(input="\n")
             info["Pass 1: sudo apt-get update"] = "yes"
-            # p = subprocess.Popen('sudo apt-get install ffmpeg', stdin=PIPE, shell=True, encoding='utf8')
+
             p = subprocess.run('sudo apt-get install ffmpeg', stdout=PIPE, input='\n', shell=True, encoding='ascii')
-            # p.communicate(input='\n')
             info["Pass 2: sudo apt-get install ffmpeg"] = "yes"
-            # p = subprocess.Popen('sudo apt-get install frei0r-plugins', stdin=PIPE, shell=True, encoding='utf8')
+
             p = subprocess.run('sudo apt-get install frei0r-plugins', stdout=PIPE, input='\n', shell=True, encoding='ascii')
-            # p.communicate(input='\n')
             info["Pass 3: sudo apt-get install frei0r-plugins"] = "yes"
-            p = subprocess.run('ffmpeg -i ' + str(filename) + ' ' + str(output_filename),  shell=True, encoding='ascii', capture_output=True, check=True)
+
+            p = subprocess.check_output("ffmpeg -version", shell=True, encoding='ascii')
+            info["Pass 4: ffmpeg -version"] = str(p)
+
+            stream = ffmpeg.input(filename)
+            stream = ffmpeg.output(stream, output_filename)
+            ffmpeg.run(stream)
+
+            # ff = ffmpy.FFmpeg(
+            #     inputs={filename: None},
+            #     outputs={output_filename: None}
+            # )
+            # ff.run()
+
+            # cmd = 'ffmpeg -i ' + str(filename) + ' ' + str(output_filename)
+            # p = subprocess.run(cmd,  shell=True, encoding='ascii', capture_output=True, check=True)
             # p = subprocess.check_call('ffmpeg -i ' + str(filename) + ' ' + str(output_filename), stdout=PIPE, input='\n', shell=True, encoding='ascii', capture_output=True, check=True)
-            info["Pass 4: ffmpeg -i filename output_filename"] = "yes"
+            info["Pass 5: ffmpeg -i filename output_filename"] = "yes"
 
             files_in_tmp = "Files: "
             dirs_in_tmp = " Dirs: "
@@ -159,20 +173,9 @@ def convert_video(request):
 
             output_filename_new_format_in_tmp = filename_in_tmp[:len(filename_in_tmp)-len(desired_format)] + desired_format
             info["output_filename_new_format_in_tmp"] = output_filename_new_format_in_tmp
-            # ff = ffmpy.FFmpeg(
-            #     inputs={filename: None},
-            #     outputs={output_filename: None}
-            # )
-            # ff.run()
 
-            #Upload to Google Cloud Bucket
-            BucketFileStorage.upload_object(source_bucket_name, output_filename_new_format_in_tmp, output_filename)
-
-            #Make a copy of it and move it to the converted bucket
-            BucketFileStorage.copy_and_write_object(source_bucket_name, output_filename, dest_bucket_name)
-
-            #Delete the copy of it inside cs378_final_raw_videos bucket
-            BucketFileStorage.delete_object(source_bucket_name, output_filename)
+            #Upload to the "converted" Google Cloud Bucket
+            BucketFileStorage.upload_object(dest_bucket_name, output_filename_new_format_in_tmp, output_filename)
 
     except CalledProcessError as cpe:
         info["CalledProcessError main output"] = str(cpe)
