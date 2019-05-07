@@ -11,6 +11,7 @@ import BucketFileStorage
 import Validator
 import ffmpy
 import subprocess
+from subprocess import Popen, run, PIPE
 
 def download_video(request):
     """
@@ -128,14 +129,25 @@ def convert_video(request):
 
             #Run the ffmpeg command using the os.popen command
             # os.popen("ffmpeg -i '{input}' '{output}'.'{format}'".format(input = filename, output = output_filename, format = desired_format))
-            cmds = ['ffmpeg', '-i', filename, output_filename]
+            # cmds = ['ffmpeg', '-i', filename, output_filename]
             # subprocess.Popen(cmds)
-            subprocess.call(['sudo', 'add-apt-repository', 'ppa:mc3man/trusty-media'])
-            subprocess.call(['sudo', 'apt-get', 'update'])
-            subprocess.call(['sudo', 'apt-get', 'install', 'ffmpeg'])
-            subprocess.call(['sudo', 'apt-get', 'install', 'frei0r-plugins'])
-            subprocess.call(['ffmpeg', '-i', filename, output_filename])
-            subprocess.call('ffmpeg -i ' + str(filename) + ' ' + str(output_filename), shell=True)
+            # p = subprocess.Popen('sudo apt-get update', stdin=PIPE, shell=True, encoding='utf8')
+            p = subprocess.run('sudo apt-get update', stdout=PIPE, input='\n', shell=True, encoding='ascii')
+            # info["Pass .5"] = "yes"
+            # p.communicate(input="\n")
+            info["Pass 1: sudo apt-get update"] = "yes"
+            # p = subprocess.Popen('sudo apt-get install ffmpeg', stdin=PIPE, shell=True, encoding='utf8')
+            p = subprocess.run('sudo apt-get install ffmpeg', stdout=PIPE, input='\n', shell=True, encoding='ascii')
+            # p.communicate(input='\n')
+            info["Pass 2: sudo apt-get install ffmpeg"] = "yes"
+            # p = subprocess.Popen('sudo apt-get install frei0r-plugins', stdin=PIPE, shell=True, encoding='utf8')
+            p = subprocess.run('sudo apt-get install frei0r-plugins', stdout=PIPE, input='\n', shell=True, encoding='ascii')
+            # p.communicate(input='\n')
+            info["Pass 3: sudo apt-get install frei0r-plugins"] = "yes"
+            # p = subprocess.Popen('ffmpeg -i ' + str(filename) + ' ' + str(output_filename), shell=True, encoding='utf8')
+            p = subprocess.run('ffmpeg -i ' + str(filename) + ' ' + str(output_filename), stdout=PIPE, input='\n', shell=True, encoding='ascii')
+            p.communicate(input=None, timeout=None)
+            info["Pass 4: ffmpeg -i filename output_filename"] = "yes"
 
             files_in_tmp = "Files: "
             dirs_in_tmp = " Dirs: "
@@ -155,13 +167,13 @@ def convert_video(request):
             # ff.run()
 
             #Upload to Google Cloud Bucket
-            # BucketFileStorage.upload_object(source_bucket_name, output_filename_new_format_in_tmp, output_filename)
+            BucketFileStorage.upload_object(source_bucket_name, output_filename_new_format_in_tmp, output_filename)
 
             #Make a copy of it and move it to the converted bucket
-            # BucketFileStorage.copy_and_write_object(source_bucket_name, output_filename, dest_bucket_name)
+            BucketFileStorage.copy_and_write_object(source_bucket_name, output_filename, dest_bucket_name)
 
             #Delete the copy of it inside cs378_final_raw_videos bucket
-            # BucketFileStorage.delete_object(source_bucket_name, output_filename)
+            BucketFileStorage.delete_object(source_bucket_name, output_filename)
 
 
     except Exception as e:
