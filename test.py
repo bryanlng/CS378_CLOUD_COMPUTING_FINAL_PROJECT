@@ -7,7 +7,7 @@ import youtube_dl
 import traceback
 import subprocess
 from subprocess import Popen, PIPE
-import ffmpy
+# import ffmpy
 import ffmpeg
 
 
@@ -71,12 +71,12 @@ def subcalls():
     p.communicate(input='\n')
     print("Pass 5\n\n\n")
 
-def ffmpymine(filename, output_filename):
-    ff = ffmpy.FFmpeg(
-        inputs={filename: None},
-        outputs={output_filename: None}
-    )
-    ff.run()
+# def ffmpymine(filename, output_filename):
+#     ff = ffmpy.FFmpeg(
+#         inputs={filename: None},
+#         outputs={output_filename: None}
+#     )
+#     ff.run()
 
 def ffmpegkorenig(filename,output_filename):
     stream = ffmpeg.input(filename)
