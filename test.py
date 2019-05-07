@@ -52,16 +52,20 @@ def download_video(request):
 def subcalls():
     filename = "mac_mac_test.mp4"
     output_filename = "mac_mac_test.mkv"
-    p = subprocess.Popen(['sudo', 'add-apt-repository', 'ppa:mc3man/trusty-media'], stdin=PIPE, shell=True)
+    #p = subprocess.Popen(['sudo', 'add-apt-repository', 'ppa:mc3man/trusty-media'], stdin=PIPE, shell=True)
+    #p.communicate(input='\n')
+    #print("pass 1\n\n\n")
+    p = subprocess.Popen('sudo apt-get update', stdin=PIPE, shell=True)
     p.communicate(input='\n')
-    p = subprocess.Popen(['sudo', 'apt-get', 'update'], stdin=PIPE, shell=True)
+    print("Pass 2\n\n\n")
+    p = subprocess.Popen('sudo apt-get install ffmpeg', stdin=PIPE, shell=True)
     p.communicate(input='\n')
-    p = subprocess.call(['sudo', 'apt-get', 'install', 'ffmpeg'], stdin=PIPE, shell=True)
+    print("Pass 3\n\n\n")
+    p = subprocess.Popen('sudo apt-get install frei0r-plugins', stdin=PIPE, shell=True)
     p.communicate(input='\n')
-    p = subprocess.call(['sudo', 'apt-get', 'install', 'frei0r-plugins'], stdin=PIPE, shell=True)
-    p.communicate(input='\n')
-    p = subprocess.call(['ffmpeg', '-i', filename, output_filename], stdin=PIPE, shell=True)
-    # p = subprocess.call('ffmpeg -i ' + str(filename) + ' ' + str(output_filename), shell=True)
-
+    print("Pass 4\n\n\n")
+    p = subprocess.Popen('ffmpeg -i ' + str(filename) + ' ' + str(output_filename), shell=True)
+    p.communicate(input='\n') 
+    print("Pass 5\n\n\n")
 # test()
 subcalls()
