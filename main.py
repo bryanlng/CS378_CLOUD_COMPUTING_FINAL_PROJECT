@@ -165,8 +165,25 @@ def convert_video(url, desired_format):
     return response
 
 
+@app.route("/printdir", methods = ['GET'])
+def printdir():
+    info = {}
+    cwd = os.getcwd()
+    info["cwd"] = cwd
 
+    filename_in_tmp = ""
+    files_in_tmp = "Files: "
+    dirs_in_tmp = " Dirs: "
+    for root, dirs, files in os.walk("/tmp"):
+        for filename in files:
+            files_in_tmp += str(os.path.join(root, filename)) + ", "
+        for dirname in dirs:
+            dirs_in_tmp += str(os.path.join(root, dirname))
 
+    info["files"] = files_in_tmp
+    info["dirs"] = dirs_in_tmp
+
+    return info
 
 def initialize():
     BucketFileStorage.create_file_structure()
@@ -182,5 +199,6 @@ def hello():
 
 if __name__ == "__main__":
     app.debug = True
+    printdir()
     initialize()
     app.run(host='0.0.0.0')
