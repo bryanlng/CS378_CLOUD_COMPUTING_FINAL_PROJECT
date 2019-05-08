@@ -61,11 +61,42 @@ def convert_video_cloud_function(request):
 def main_process():
     print("Main process")
     #Grab parameters (url, format to convert to, time stamps)
+    url = "https://www.youtube.com/watch?v=BotpJkJ0BKE"
+    desired_format = "mp3"
+
+    download_video(url)
+    convert_video(url, desired_format)
 
     #Validate URL
+    converted_video = None
+    try:
+        Validator.validate_youtube_url(url)
 
-    #Check if (video id, media format) pair exists in the converted bucket
-    #If it does, find the video in the bucket
+        #Check if (video id, media format) pair exists in the converted bucket
+        converted_filename = Validator.extract_video_id(url) + "." + desired_format
+        converted_bucket = "cs378_final_converted_videos"
+        converted_file = BucketFileStorage.get_object_from_bucket(converted_filename, converted_bucket)
+
+        #If the video doesn't exist in the converted bucket:
+        if converted_file is None:
+            #Check if video id pair exists in the raw bucket
+            raw_filename = Validator.extract_video_id(url) + "." + desired_format
+            raw_bucket = "cs378_final_raw_videos"
+            raw_file = BucketFileStorage.get_object_from_bucket(raw_filename, raw_bucket)
+
+            #If the video hasn't been downloaded yet, make a call to our download cloud function to download it
+            if raw_file is None:
+                download_video(url)
+
+            #Aftewards, convert the video into
+            convert_video(url, desired_format)
+
+        #Download video from converted bucket
+        BucketFileStorage.download_object(converted_filename, converted_bucket, converted_filename)
+
+    except Exception as e:
+        print(e)
+
 
 
 
@@ -94,7 +125,7 @@ def download_video(url):
         print("Download video cloud function output: {}".format(raw_response))
         response["successfully_downloaded"] = True
         response["time_to_download"] = time_to_download
-        response["response"] = raw_response
+        response["response"] = str(raw_response.json())
     except Exception as e:
         response["error"] = str(e)
 
@@ -126,7 +157,7 @@ def convert_video(url, desired_format):
         print("Convert video cloud function output: {}".format(raw_response))
         response["successfully_downloaded"] = True
         response["time_to_download"] = time_to_download
-        response["response"] = raw_response
+        response["response"] = str(raw_response.json())
     except Exception as e:
         response["error"] = str(e)
 
@@ -157,9 +188,9 @@ if __name__ == "__main__":
     # print("Title: {}, Thumbnail url: {}".format(t,th))
     # BucketFileStorage.create_file_structure()
     initialize()
-    url = "https://www.youtube.com/watch?v=BotpJkJ0BKE"
-    desired_format = "mp3"
-    download_video(url)
-    convert_video(url, desired_format)
+    # url = "https://www.youtube.com/watch?v=BotpJkJ0BKE"
+    # desired_format = "mp3"
+    # download_video(url)
+    # convert_video(url, desired_format)
     # BucketFileStorage.get_object_from_bucket("doesntexist.txt", "cs378_final_raw_videos")
     app.run(host='0.0.0.0')
