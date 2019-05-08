@@ -3,11 +3,50 @@ from google.auth import compute_engine
 import requests
 import json
 import os
-
+import boto3
+import botocore
+import subprocess
+from subprocess import run, PIPE
 
 #Creds
 credentials = compute_engine.Credentials()
 PROJECT_ID = os.environ.get("PROJECT_ID", None)
+aws_access_key_id = os.environ.get("aws_access_key_id", None)
+aws_secret_access_key = os.environ.get("aws_secret_access_key", None)
+
+def obtain_credentials_from_aws_s3():
+    # s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
+    # BUCKET_NAME = "cs378-final-project-cloud-storage-bucket-creds"
+    # OBJECT_NAME = "cs378-final-project-media-5360efad6b3d.json"
+    # FILE_NAME = "C:/cs378-final-project-media-5360efad6b3d.json"
+    # s3.download_file(BUCKET_NAME, OBJECT_NAME, FILE_NAME)
+
+    BUCKET_NAME = 'cs378-final-project-cloud-storage-bucket-creds' # replace with your bucket name
+    KEY = 'cs378-final-project-media-5360efad6b3d.json' # replace with your object key
+
+    s3 = boto3.resource('s3')
+
+    try:
+        s3.Bucket(BUCKET_NAME).download_file(KEY, KEY)
+    except botocore.exceptions.ClientError as e:
+        if e.response['Error']['Code'] == "404":
+            print("The object does not exist.")
+        else:
+            raise
+
+
+
+def set_credentials_from_aws_s3():
+    cwd = os.getcwd()
+    print("cwd: ", cwd)
+    FILE_NAME = cwd + "\\" + "cs378-final-project-media-5360efad6b3d.json"
+    p = subprocess.run(["set", "GOOGLE_APPLICATION_CREDENTIALS", "=", FILE_NAME], check=True, stdout=PIPE, input='\n')
+
+
+#Get creds for GOOGLE_APPLICATION_CREDENTIALS
+obtain_credentials_from_aws_s3()
+set_credentials_from_aws_s3()
+
 
 """
 Creates the file structure for the Buckets

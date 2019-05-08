@@ -62,8 +62,6 @@ def main_process():
     #Grab parameters (url, format to convert to, time stamps)
     url = str(request.args.get("url"))
     desired_format = str(request.args.get("desired_format"))
-    # url = "https://www.youtube.com/watch?v=BotpJkJ0BKE"
-    # desired_format = "mp3"
 
     info = {}
     info["url"] = url
@@ -184,16 +182,5 @@ def hello():
 
 if __name__ == "__main__":
     app.debug = True
-    # video_id = "7QBEIVuNrnQ"
-    # video_id = "Y-DvKfsG18w"
-    # t = YoutubeData.get_title(video_id)
-    # th = YoutubeData.get_thumbnail(video_id)
-    # print("Title: {}, Thumbnail url: {}".format(t,th))
-    # BucketFileStorage.create_file_structure()
     initialize()
-    # url = "https://www.youtube.com/watch?v=BotpJkJ0BKE"
-    # desired_format = "mp3"
-    # download_video(url)
-    # convert_video(url, desired_format)
-    # BucketFileStorage.get_object_from_bucket("doesntexist.txt", "cs378_final_raw_videos")
     app.run(host='0.0.0.0')
