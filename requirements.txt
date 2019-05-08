@@ -1,3 +1,5 @@
+boto3==1.9.4
+botocore==1.12.4
 Flask==1.0.2
 ffmpeg==1.4
 ffmpeg-python==0.1.17
@@ -7,4 +9,5 @@ gcloud==0.17.0
 google-api-core==1.10.0
 google-auth==1.6.3
 pytube==9.5.0
+urllib3==1.23
 youtube-dl==2019.4.30
