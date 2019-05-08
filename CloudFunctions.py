@@ -165,6 +165,19 @@ def convert_video(request):
             #Upload to the "converted" Google Cloud Bucket
             BucketFileStorage.upload_object(dest_bucket_name, output_filename, output_filename_new_format_in_tmp)
 
+            #Delete all files so we can be idempotent
+            filelist = [os.remove(os.path.join("/tmp", f)) for f in os.listdir("/tmp")]
+
+            #Make sure all files have been deleted
+            files_in_tmp = "Files: "
+            dirs_in_tmp = " Dirs: "
+            for root, dirs, files in os.walk("/tmp"):
+                for filename in files:
+                    files_in_tmp += str(os.path.join(root, filename)) + ", "
+                for dirname in dirs:
+                    dirs_in_tmp += str(os.path.join(root, dirname)) + ", "
+            info["after_files_and_dirs_in_tmp"] = files_in_tmp + dirs_in_tmp
+
     except CalledProcessError as cpe:
         info["CalledProcessError main output"] = str(cpe)
         info["CalledProcessError returncode"] = str(cpe.returncode)
