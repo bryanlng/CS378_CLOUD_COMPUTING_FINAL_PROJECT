@@ -147,19 +147,7 @@ def convert_video(request):
             p = subprocess.check_output("ffmpeg -version", shell=True, encoding='ascii')
             info["Pass 4: ffmpeg -version"] = str(p)
 
-            # stream = ffmpeg.input(filename)
-            # stream = ffmpeg.output(stream, output_filename)
-            # ffmpeg.run(stream)
-
-            # ff = ffmpy.FFmpeg(
-            #     inputs={filename: None},
-            #     outputs={output_filename: None}
-            # )
-            # ff.run()
-
-            # cmd = 'ffmpeg -i ' + str(filename) + ' ' + str(output_filename)
             p = subprocess.run(["ffmpeg", "-i", filename_in_tmp , output_filename], check=True)
-            # p = subprocess.check_call('ffmpeg -i ' + str(filename) + ' ' + str(output_filename), stdout=PIPE, input='\n', shell=True, encoding='ascii', capture_output=True, check=True)
             info["Pass 5: ffmpeg -i filename output_filename"] = "yes"
 
             files_in_tmp = "Files: "
@@ -188,45 +176,3 @@ def convert_video(request):
         info["problems_just_e"] = str(e)
 
     return jsonify(info)
-
-
-
-
-# def download_video_youtube_dl(request):
-#     """
-#     Calls youtube-dl
-#
-#     Input:
-#     return jsonify(request.args)
-#     request object, which is a Flask Request object
-#     Extract the following parameters out from request.args:
-#     1. URL:
-#         -the full url, not just the video id
-#     """
-#
-#     # raw = str(request.args["url"])
-#     # encoded = raw.encode("utf-8")
-#     # url = io.BytesIO(encoded)
-#
-#     url = str(request.args.get("url"))
-#     info = {}
-#     # info["type"] = str(type(url))
-#     # info["python_version"] = str(sys.version)
-#     # info["Version_info"] = str(sys.version_info)
-#     # info["url"] = str(url)
-#     s = "dummy"
-#     info["dummy"] = s
-#     try:
-#         ydl_opts = {
-#             'outtmpl': '/tmp/%(id)s'
-#         }
-#         ydl_opts = {}
-#         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-#             result = ydl.download([url])
-#
-#     except Exception as e:
-#         error = traceback.print_exc()
-#         info["problems_traceback"] = str(error)
-#         info["problems_just_e"] = str(e)
-#
-#     return jsonify(info)

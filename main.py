@@ -61,7 +61,6 @@ def main_process():
     print("Main process")
     #Grab parameters (url, format to convert to, time stamps)
 
-
     #Validate URL
 
     #Check if (video id, media format) pair exists in the converted bucket
@@ -69,19 +68,54 @@ def main_process():
 
 
 
-def download_video():
-    #Make a HTTP get call to our cloud function
-    response = None
+def download_video(url):
+    """
+    Input:      Youtube URL
+    Make a HTTP get call to our cloud function
+    """
+    response = {}
     try:
-        query = "https://www.googleapis.com/youtube/v3/videos/?part=snippet&id=" + video_id + "&key=" + GCP_CS378_MASTER_ADMIN_API_KEY
-        response = requests.get(youtube_query)
+        query = "https://us-central1-cs378-final-project-media.cloudfunctions.net/download_video_cloud_function?url=" + url
+        response = requests.get(query)
 
+        #Continually poll our bucket until the video we want exists in the raw bucket
+        filename = Validator.extract_video_id(url) + ".mp4"
+        bucket_name = "cs378_final_raw_videos"
+        video_downloaded = False
+        while video_downloaded is False:
+            video_downloaded = BucketFileStorage.get_object_from_bucket(filename, bucket_name) is None
+            time.sleep(1)
+
+        response["successfully_downloaded"] = True
     except Exception as e:
-        print(e)
+        response["error"] = str(e)
+
     return response
 
 
+def convert_video(url, desired_format):
+    """
+    Input:      Youtube URL, desired_format
+    Make a HTTP get call to our cloud function
+    """
+    response = {}
+    try:
+        query = "https://us-central1-cs378-final-project-media.cloudfunctions.net/convert_video_cloud_function?url=" + url + "&desired_format=" + desired_format
+        response = requests.get(query)
 
+        #Continually poll our bucket until the video we want exists in the converted bucket
+        filename = Validator.extract_video_id(url) + desired_format
+        bucket_name = "cs378_final_converted_videos"
+        video_converted = False
+        while video_converted is False:
+            video_converted = BucketFileStorage.get_object_from_bucket(filename, bucket_name) is None
+            time.sleep(1)
+
+        response["successfully_downloaded"] = True
+    except Exception as e:
+        response["error"] = str(e)
+
+    return response
 
 
 
