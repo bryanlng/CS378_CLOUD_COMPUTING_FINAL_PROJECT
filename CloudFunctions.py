@@ -171,7 +171,7 @@ def convert_video(request):
                 for dirname in dirs:
                     dirs_in_tmp += str(os.path.join(root, dirname)) + ", "
             info["after_files_and_dirs_in_tmp"] = files_in_tmp + dirs_in_tmp
-            take_away_tmp = len("/tmp/")+1
+            take_away_tmp = len("/tmp/")
             output_filename_new_format_in_tmp = output_filename[take_away_tmp:len(output_filename)-len(desired_format)] + desired_format
             info["output_filename_new_format_in_tmp"] = output_filename_new_format_in_tmp
 
