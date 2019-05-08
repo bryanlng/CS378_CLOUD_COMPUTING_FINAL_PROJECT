@@ -1,11 +1,13 @@
 from google.cloud import storage
+from google.auth import compute_engine
 import requests
 import json
 import os
 
 
 #Creds
-GCP_CS378_MASTER_ADMIN_API_KEY = os.environ.get("GCP_CS378_MASTER_ADMIN_API_KEY", None)
+credentials = compute_engine.Credentials()
+PROJECT_ID = os.environ.get("PROJECT_ID", None)
 
 """
 Creates the file structure for the Buckets
@@ -13,7 +15,7 @@ If we don't currently have the required bucket structure, it deletes all the cur
 then adds all the buckets
 """
 def create_file_structure():
-    storage_client = storage.Client()
+    storage_client = storage.Client(credentials=credentials, project=PROJECT_ID)
 
     # Check if the buckets have already been created
     b = storage_client.list_buckets()
@@ -47,7 +49,7 @@ Note that blob.name will give "filename.fileext"
 Returns it in a variable
 """
 def get_object_from_bucket(filename, bucket_name):
-    storage_client = storage.Client()
+    storage_client = storage.Client(credentials=credentials, project=PROJECT_ID)
     bucket = storage_client.get_bucket(bucket_name)
     blobs = bucket.list_blobs()
     file = None
@@ -72,7 +74,7 @@ Downloads it, in FILE form
 """
 def download_object(source_blob_name, bucket_name, destination_file_name):
     """Downloads a blob from the bucket."""
-    storage_client = storage.Client()
+    storage_client = storage.Client(credentials=credentials, project=PROJECT_ID)
     bucket = storage_client.get_bucket(bucket_name)
     blob = bucket.blob(source_blob_name)
 
@@ -88,7 +90,7 @@ Uploads an object to the bucket
 """
 def upload_object(bucket_name, source_file_name, destination_blob_name):
     """Uploads a file to the bucket."""
-    storage_client = storage.Client()
+    storage_client = storage.Client(credentials=credentials, project=PROJECT_ID)
     bucket = storage_client.get_bucket(bucket_name)
     blob = bucket.blob(destination_blob_name)
 
@@ -103,7 +105,7 @@ Copies an object, then puts it into the destination_bucket
 """
 def copy_and_write_object(source_bucket_name, blob_name, dest_bucket_name):
     """Copies a blob from one bucket to another with a new name."""
-    storage_client = storage.Client()
+    storage_client = storage.Client(credentials=credentials, project=PROJECT_ID)
     source_bucket = storage_client.get_bucket(source_bucket_name)
     source_blob = source_bucket.blob(blob_name)
     destination_bucket = storage_client.get_bucket(dest_bucket_name)
@@ -120,7 +122,7 @@ Delete object from bucket
 """
 def delete_object(bucket_name, blob_name):
     """Deletes a blob from the bucket."""
-    storage_client = storage.Client()
+    storage_client = storage.Client(credentials=credentials, project=PROJECT_ID)
     bucket = storage_client.get_bucket(bucket_name)
     blob = bucket.blob(blob_name)
 
