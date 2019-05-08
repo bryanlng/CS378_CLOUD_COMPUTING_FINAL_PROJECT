@@ -196,4 +196,5 @@ if __name__ == "__main__":
     # download_video(url)
     # convert_video(url, desired_format)
     # BucketFileStorage.get_object_from_bucket("doesntexist.txt", "cs378_final_raw_videos")
+    BucketFileStorage.get_object_from_bucket("doesntexist.txt", "cs378_final_raw_videos")
     app.run(host='0.0.0.0')

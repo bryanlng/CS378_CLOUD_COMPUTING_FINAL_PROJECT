@@ -1,0 +1,28 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: deployment
+  labels:
+    app: finalproject
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: finalproject
+  template:
+    metadata:
+      labels:
+        app: finalproject
+    spec:
+      containers:
+      - name: finalproject1
+        image: gcr.io/cs378-final-project-media/finalproject:v1
+        ports:
+        - containerPort: 5000
+        env:
+          - name: "PROJECT_ID"
+            value: cs378-final-project-media
+          - name: "GCP_CS378_MASTER_ADMIN_API_KEY"
+            value: AIzaSyD0H47uQjZF12SOdaMRDFnbmkVlbSxJBhA
+          - name: "CLOUDSDK_COMPUTE_ZONE"
+            value: us-central1-b
