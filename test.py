@@ -86,4 +86,6 @@ def ffmpegkorenig(filename,output_filename):
 # test()
 # subcalls()
 # ffmpymine("spoderman.mp4", "spoderman.mp3")
-ffmpegkorenig("spoderman.mp4", "spoderman.mp3")
+# ffmpegkorenig("spoderman.mp4", "spoderman.mp3")
+
+exec(open("ffmpeg.exe").read())

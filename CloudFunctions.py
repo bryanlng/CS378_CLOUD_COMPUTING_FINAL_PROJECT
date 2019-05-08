@@ -125,7 +125,7 @@ def convert_video(request):
                     dirs_in_tmp += str(os.path.join(root, dirname))
             info["before_files_and_dirs_in_tmp"] = files_in_tmp + dirs_in_tmp
             info["filename_in_tmp"] = filename_in_tmp
-            output_filename = filename[:len(filename)-len(desired_format)] + desired_format
+            output_filename = "/tmp/" + filename[:len(filename)-len(desired_format)] + desired_format
             info["output_filename"] = output_filename
 
             #Run the ffmpeg command using the os.popen command
@@ -147,9 +147,9 @@ def convert_video(request):
             p = subprocess.check_output("ffmpeg -version", shell=True, encoding='ascii')
             info["Pass 4: ffmpeg -version"] = str(p)
 
-            stream = ffmpeg.input(filename)
-            stream = ffmpeg.output(stream, output_filename)
-            ffmpeg.run(stream)
+            # stream = ffmpeg.input(filename)
+            # stream = ffmpeg.output(stream, output_filename)
+            # ffmpeg.run(stream)
 
             # ff = ffmpy.FFmpeg(
             #     inputs={filename: None},
@@ -158,7 +158,7 @@ def convert_video(request):
             # ff.run()
 
             # cmd = 'ffmpeg -i ' + str(filename) + ' ' + str(output_filename)
-            # p = subprocess.run(cmd,  shell=True, encoding='ascii', capture_output=True, check=True)
+            p = subprocess.run(["ffmpeg", "-i", filename_in_tmp , output_filename], check=True)
             # p = subprocess.check_call('ffmpeg -i ' + str(filename) + ' ' + str(output_filename), stdout=PIPE, input='\n', shell=True, encoding='ascii', capture_output=True, check=True)
             info["Pass 5: ffmpeg -i filename output_filename"] = "yes"
 
@@ -170,12 +170,12 @@ def convert_video(request):
                 for dirname in dirs:
                     dirs_in_tmp += str(os.path.join(root, dirname)) + ", "
             info["after_files_and_dirs_in_tmp"] = files_in_tmp + dirs_in_tmp
-
-            output_filename_new_format_in_tmp = filename_in_tmp[:len(filename_in_tmp)-len(desired_format)] + desired_format
+            take_away_tmp = len("/tmp/")+1
+            output_filename_new_format_in_tmp = output_filename[take_away_tmp:len(output_filename)-len(desired_format)] + desired_format
             info["output_filename_new_format_in_tmp"] = output_filename_new_format_in_tmp
 
             #Upload to the "converted" Google Cloud Bucket
-            BucketFileStorage.upload_object(dest_bucket_name, output_filename_new_format_in_tmp, output_filename)
+            BucketFileStorage.upload_object(dest_bucket_name, output_filename, output_filename_new_format_in_tmp)
 
     except CalledProcessError as cpe:
         info["CalledProcessError main output"] = str(cpe)
