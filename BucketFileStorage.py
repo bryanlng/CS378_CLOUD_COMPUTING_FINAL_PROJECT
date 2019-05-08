@@ -32,14 +32,14 @@ def obtain_credentials_from_aws_s3():
         if e.response['Error']['Code'] == "404":
             print("The object does not exist.")
         else:
-            raise
+            raise e
 
 
 
 def set_credentials_from_aws_s3():
     cwd = os.getcwd()
     print("cwd: ", cwd)
-    FILE_NAME = cwd + "\\" + "cs378-final-project-media-5360efad6b3d.json"
+    FILE_NAME = "cs378-final-project-media-5360efad6b3d.json"
     p = subprocess.run(["set", "GOOGLE_APPLICATION_CREDENTIALS", "=", FILE_NAME], check=True, stdout=PIPE, input='\n')
 
 
