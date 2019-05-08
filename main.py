@@ -57,19 +57,20 @@ def convert_video_cloud_function(request):
 #######################################################################
 ###Web App Backend Functions###########################################
 #######################################################################
-@app.route("/convert_video")
+@app.route("/convert_video", methods = ['GET'])
 def main_process():
-    print("Main process")
     #Grab parameters (url, format to convert to, time stamps)
-    url = "https://www.youtube.com/watch?v=BotpJkJ0BKE"
-    desired_format = "mp3"
+    url = str(request.args.get("url"))
+    desired_format = str(request.args.get("desired_format"))
+    # url = "https://www.youtube.com/watch?v=BotpJkJ0BKE"
+    # desired_format = "mp3"
 
-    download_video(url)
-    convert_video(url, desired_format)
-
-    #Validate URL
+    info = {}
+    info["url"] = url
+    info["desired_format"] = desired_format
     converted_video = None
     try:
+        #Validate URL
         Validator.validate_youtube_url(url)
 
         #Check if (video id, media format) pair exists in the converted bucket
@@ -96,6 +97,8 @@ def main_process():
 
     except Exception as e:
         print(e)
+
+    return jsonify(info)
 
 
 
