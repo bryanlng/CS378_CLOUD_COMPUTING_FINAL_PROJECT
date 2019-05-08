@@ -1,6 +1,4 @@
-FROM ubuntu:16.04
-RUN apt-get update -y \
-    && apt-get install -y python-setuptools python-pip python-mysqldb
+FROM python:3.6
 ADD requirements.txt /src/requirements.txt
 RUN cd /src; pip install -r requirements.txt
 ADD . /src
